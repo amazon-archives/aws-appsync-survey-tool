@@ -2,9 +2,10 @@
 
 Sample Survey Tool Progressive Web Application written with React, GraphQL, AWS AppSync & AWS Amplify
 
+[![amplifybutton](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/username/repository)
+
 ![](src/assets/header.png)
 
-Progressive Web Application written with React, GraphQL, AWS AppSync, & AWS Amplify
 
 ## Features
 
