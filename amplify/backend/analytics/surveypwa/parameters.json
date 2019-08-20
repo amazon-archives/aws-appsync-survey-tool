@@ -1,0 +1,20 @@
+{
+    "appName": "surveypwa",
+    "roleName": "pinpointLambdaRole4b91d4de",
+    "cloudWatchPolicyName": "cloudWatchPolicy4b91d4de",
+    "pinpointPolicyName": "pinpointPolicy4b91d4de",
+    "authPolicyName": "pinpoint_amplify_4b91d4de",
+    "unauthPolicyName": "pinpoint_amplify_4b91d4de",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "authRoleArn": {
+        "Fn::GetAtt": [
+            "AuthRole",
+            "Arn"
+        ]
+    }
+}

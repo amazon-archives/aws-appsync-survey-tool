@@ -1,0 +1,85 @@
+type Survey
+  @model
+  @auth (rules: [
+    {allow: groups, groups: ["SurveyAdmins"]},
+    {allow: groups, groupsField: "groups", operations: [read]}
+    ])
+{
+  id: ID!
+  name: String!
+  description: String!
+  image: AWSURL
+  preQuestionnaire: Questionnaire @connection
+  mainQuestionnaire: Questionnaire @connection
+  postQuestionnaire: Questionnaire @connection
+  archived: Boolean
+  groups: [String]!
+}
+
+type Questionnaire
+  @model
+{
+  id: ID!
+  name: String!
+  description: String!
+  type: QuestionnaireType
+  question: [Question] @connection(name: "QuestionnaireQuestions")
+  # question: [Question] @connection(name: "QuestionnaireQuestions", sortField: "order")
+}
+
+enum QuestionnaireType {
+    PRE
+    POST
+    MAIN
+}
+
+type Question
+  @model
+{
+    id: ID!
+    qu: String!
+    type: QuestionType!
+    listOptions: [String]
+    questionnaire: Questionnaire @connection(name: "QuestionnaireQuestions")
+    order: Int
+}
+
+enum QuestionType {
+    LIST
+    BOOL
+    TEXT
+    DATETIME
+}
+
+type Responses
+  @model
+  @auth(rules: [{allow: owner}])
+{
+    id: ID!
+    qu: Question! @connection
+    res: String!
+    group: SurveyEntries @connection(name: "SurveyEntryResponses")
+}
+
+type SurveyEntries
+  @model
+  @auth(rules: [{allow: owner}])
+{
+    id: ID!
+    responses: [Responses] @connection(name: "SurveyEntryResponses")
+}
+
+type Query
+{
+  listUsers(UserPoolId: String): String
+	listGroups(UserPoolId: String): String
+  listGroupMembers(UserPoolId: String, GroupName: String): String
+}
+
+type Mutation
+{
+  deleteUser(UserPoolId: String, Username: String): String
+  addUserToGroup(UserPoolId: String, Username: String, GroupName: String): String
+  addGroup(UserPoolId: String, GroupName: String): String
+  deleteGroup(UserPoolId: String, GroupName: String): String
+}

@@ -1,0 +1,261 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "An auto-generated nested stack. Updated",
+    "Metadata": {},
+    "Parameters": {
+        "AppSyncApiId": {
+            "Type": "String",
+            "Description": "The id of the AppSync API associated with this project."
+        },
+        "AppSyncApiName": {
+            "Type": "String",
+            "Description": "The name of the AppSync API",
+            "Default": "AppSyncSimpleTransform"
+        },
+        "env": {
+            "Type": "String",
+            "Description": "The environment name. e.g. Dev, Test, or Production",
+            "Default": "NONE"
+        },
+        "S3DeploymentBucket": {
+            "Type": "String",
+            "Description": "The S3 bucket containing all deployment assets for the project."
+        },
+        "S3DeploymentRootKey": {
+            "Type": "String",
+            "Description": "An S3 key relative to the S3DeploymentBucket that points to the root\nof the deployment directory."
+        }
+    },
+    "Resources": {
+        "awsAppSyncServiceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "appsync.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/"
+            }
+        },
+        "CognitoAccessPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "AppSyncCognitoAccess",
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "cognito-idp:*",
+                            "Resource": "*"
+                        }
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "awsAppSyncServiceRole"
+                    }
+                ]
+            }
+        },
+        "CognitoHTTPDataSource": {
+            "Type": "AWS::AppSync::DataSource",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "Name": "CognitoResolver",
+                "Description": "Cognito HTTP data source",
+                "Type": "HTTP",
+                "HttpConfig": {
+                    "AuthorizationConfig": {
+                        "AuthorizationType": "AWS_IAM",
+                        "AwsIamConfig": {
+                            "SigningRegion": "ap-southeast-2",
+                            "SigningServiceName": "cognito-idp"
+                        }
+                    },
+                    "Endpoint": "https://cognito-idp.ap-southeast-2.amazonaws.com/"
+                },
+                "ServiceRoleArn": {
+                    "Fn::GetAtt": [
+                        "awsAppSyncServiceRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "queryListUsersResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "TypeName": "Query",
+                "FieldName": "listUsers",
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "CognitoHTTPDataSource",
+                        "Name"
+                    ]
+                },
+                "RequestMappingTemplate": "{\n  \"version\": \"2018-05-29\",\n  \"method\": \"POST\",\n  \"resourcePath\": \"/\",\n  \"params\":\n    {\n      \"headers\" : {\n          \"Content-Type\" : \"application/x-amz-json-1.1\",\n          \"X-Amz-Target\" : \"AWSCognitoIdentityProviderService.ListUsers\"\n      },\n      \"body\": {\n          \"UserPoolId\":\"$context.arguments.UserPoolId\"\n        }\n    }\n}\n",
+                "ResponseMappingTemplate": "$util.toJson($context.result.body)\n"
+            }
+        },
+        "queryListGroupsResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "TypeName": "Query",
+                "FieldName": "listGroups",
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "CognitoHTTPDataSource",
+                        "Name"
+                    ]
+                },
+                "RequestMappingTemplate": "{\n  \"version\": \"2018-05-29\",\n  \"method\": \"POST\",\n  \"resourcePath\": \"/\",\n  \"params\":\n    {\n      \"headers\" : {\n          \"Content-Type\" : \"application/x-amz-json-1.1\",\n          \"X-Amz-Target\" : \"AWSCognitoIdentityProviderService.ListGroups\"\n      },\n      \"body\": {\n          \"UserPoolId\":\"$context.arguments.UserPoolId\"\n        }\n    }\n}\n",
+                "ResponseMappingTemplate": "$util.toJson($context.result.body)\n"
+            }
+        },
+        "queryListGroupMembersResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "TypeName": "Query",
+                "FieldName": "listGroupMembers",
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "CognitoHTTPDataSource",
+                        "Name"
+                    ]
+                },
+                "RequestMappingTemplate": "{\n  \"version\": \"2018-05-29\",\n  \"method\": \"POST\",\n  \"resourcePath\": \"/\",\n  \"params\":\n    {\n      \"headers\" : {\n          \"Content-Type\" : \"application/x-amz-json-1.1\",\n          \"X-Amz-Target\" : \"AWSCognitoIdentityProviderService.ListUsersInGroup\"\n      },\n      \"body\": {\n          \"UserPoolId\":\"$context.arguments.UserPoolId\",\n          \"GroupName\":\"$context.arguments.GroupName\"\n        }\n    }\n}\n",
+                "ResponseMappingTemplate": "$util.toJson($context.result.body)\n"
+            }
+        },
+        "mutationDeleteUserResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "TypeName": "Mutation",
+                "FieldName": "deleteUser",
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "CognitoHTTPDataSource",
+                        "Name"
+                    ]
+                },
+                "RequestMappingTemplate": "{\n  \"version\": \"2018-05-29\",\n  \"method\": \"POST\",\n  \"resourcePath\": \"/\",\n  \"params\":\n    {\n      \"headers\" : {\n          \"Content-Type\" : \"application/x-amz-json-1.1\",\n          \"X-Amz-Target\" : \"AWSCognitoIdentityProviderService.AdminDeleteUser\"\n      },\n      \"body\": {\n          \"UserPoolId\":\"$context.arguments.UserPoolId\",\n          \"Username\":\"$context.arguments.Username\"\n        }\n    }\n}\n",
+                "ResponseMappingTemplate": "$util.toJson($context.result.body)\n"
+            }
+        },
+        "mutationAddUserToGroupResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "TypeName": "Mutation",
+                "FieldName": "addUserToGroup",
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "CognitoHTTPDataSource",
+                        "Name"
+                    ]
+                },
+                "RequestMappingTemplate": "{\n  \"version\": \"2018-05-29\",\n  \"method\": \"POST\",\n  \"resourcePath\": \"/\",\n  \"params\":\n    {\n      \"headers\" : {\n          \"Content-Type\" : \"application/x-amz-json-1.1\",\n          \"X-Amz-Target\" : \"AWSCognitoIdentityProviderService.AdminAddUserToGroup\"\n      },\n      \"body\": {\n          \"UserPoolId\":\"$context.arguments.UserPoolId\",\n          \"Username\":\"$context.arguments.Username\",\n          \"Username\":\"$context.arguments.GroupName\"\n        }\n    }\n}\n",
+                "ResponseMappingTemplate": "$util.toJson($context.result.body)\n"
+            }
+        },
+        "mutationAddGroupResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "TypeName": "Mutation",
+                "FieldName": "addGroup",
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "CognitoHTTPDataSource",
+                        "Name"
+                    ]
+                },
+                "RequestMappingTemplate": "{\n  \"version\": \"2018-05-29\",\n  \"method\": \"POST\",\n  \"resourcePath\": \"/\",\n  \"params\":\n    {\n      \"headers\" : {\n          \"Content-Type\" : \"application/x-amz-json-1.1\",\n          \"X-Amz-Target\" : \"AWSCognitoIdentityProviderService.CreateGroup\"\n      },\n      \"body\": {\n          \"UserPoolId\":\"$context.arguments.UserPoolId\",\n          \"GroupName\":\"$context.arguments.GroupName\"\n        }\n    }\n}\n",
+                "ResponseMappingTemplate": "$util.toJson($context.result.body)\n"
+			}
+		},
+		"mutationDeleteGroupResolver": {
+			"Type": "AWS::AppSync::Resolver",
+			"Properties": {
+				"ApiId": {
+					"Ref": "AppSyncApiId"
+				},
+				"TypeName": "Mutation",
+				"FieldName": "deleteGroup",
+				"DataSourceName": {
+					"Fn::GetAtt": [
+						"CognitoHTTPDataSource",
+						"Name"
+					]
+				},
+				"RequestMappingTemplate": "{\n  \"version\": \"2018-05-29\",\n  \"method\": \"POST\",\n  \"resourcePath\": \"/\",\n  \"params\":\n    {\n      \"headers\" : {\n          \"Content-Type\" : \"application/x-amz-json-1.1\",\n          \"X-Amz-Target\" : \"AWSCognitoIdentityProviderService.DeleteGroup\"\n      },\n      \"body\": {\n          \"UserPoolId\":\"$context.arguments.UserPoolId\",\n          \"GroupName\":\"$context.arguments.GroupName\"\n        }\n    }\n}\n",
+				"ResponseMappingTemplate": "$util.toJson($context.result.body)\n"
+			}
+		}
+    },
+    "Conditions": {
+        "HasEnvironmentParameter": {
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "env"
+                        },
+                        "NONE"
+                    ]
+                }
+            ]
+        },
+        "AlwaysFalse": {
+            "Fn::Equals": [
+                "true",
+                "false"
+            ]
+        }
+    },
+    "Outputs": {
+        "CognitoHTTPDataSourceARN": {
+            "Description": "Cognito Data Source ARN",
+            "Value": {
+                "Ref": "CognitoHTTPDataSource"
+            }
+        },
+        "queryListUsersResolverARN": {
+            "Description": "ListUsers Resolver ARN",
+            "Value": {
+                "Ref": "queryListUsersResolver"
+            }
+        }
+    }
+}

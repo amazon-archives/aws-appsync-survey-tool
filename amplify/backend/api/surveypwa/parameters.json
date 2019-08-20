@@ -1,0 +1,10 @@
+{
+    "AppSyncApiName": "surveypwa",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authsurveypwa1a7615c6",
+            "Outputs.UserPoolId"
+        ]
+    }
+}

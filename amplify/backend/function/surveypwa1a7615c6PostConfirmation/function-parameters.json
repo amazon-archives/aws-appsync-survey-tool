@@ -1,0 +1,14 @@
+{
+    "trigger": true,
+    "modules": [
+        "add-to-group"
+    ],
+    "parentResource": "surveypwa1a7615c6",
+    "functionName": "surveypwa1a7615c6PostConfirmation",
+    "parentStack": "auth",
+    "triggerEnvs": "[]",
+    "triggerTemplate": "PostConfirmation.json.ejs",
+    "roleName": "surveypwa1a7615c6PostConfirmation",
+    "skipEdit": true,
+    "resourceName": "surveypwa1a7615c6PostConfirmation"
+}

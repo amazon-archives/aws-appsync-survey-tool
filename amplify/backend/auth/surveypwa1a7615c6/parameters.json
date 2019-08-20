@@ -1,0 +1,90 @@
+{
+    "identityPoolName": "surveypwa1a7615c6_identitypool_1a7615c6",
+    "allowUnauthenticatedIdentities": false,
+    "openIdLambdaRoleName": "survey_1a7615c6_openid_lambda_role",
+    "resourceNameTruncated": "surveya1504313",
+    "userPoolName": "surveypwa1a7615c6_userpool_1a7615c6",
+    "autoVerifiedAttributes": [
+        "email"
+    ],
+    "mfaConfiguration": "OFF",
+    "mfaTypes": [
+        "SMS Text Message"
+    ],
+    "smsAuthenticationMessage": "Your authentication code is {####}",
+    "smsVerificationMessage": "Your verification code is {####}",
+    "emailVerificationSubject": "Your verification code",
+    "emailVerificationMessage": "Your verification code is {####}",
+    "defaultPasswordPolicy": false,
+    "passwordPolicyMinLength": 8,
+    "passwordPolicyCharacters": [],
+    "requiredAttributes": [
+        "email"
+    ],
+    "userpoolClientName": "survey1a7615c6_app_client",
+    "userpoolClientGenerateSecret": true,
+    "userpoolClientRefreshTokenValidity": 30,
+    "userpoolClientWriteAttributes": [
+        "email"
+    ],
+    "userpoolClientReadAttributes": [
+        "email"
+    ],
+    "mfaLambdaRole": "survey1a7615c6_totp_lambda_role",
+    "userpoolClientLambdaRole": "survey1a7615c6_userpoolclient_lambda_role",
+    "userpoolClientSetAttributes": false,
+    "lambdaLogPolicy": "survey_1a7615c6_lambda_log_policy",
+    "openIdRolePolicy": "survey_1a7615c6_openid_pass_role_policy",
+    "openIdLambdaIAMPolicy": "survey_1a7615c6_openid_lambda_iam_policy",
+    "openIdLogPolicy": "survey_1a7615c6_openid_lambda_log_policy",
+    "roleName": "survey1a7615c6_sns-role",
+    "roleExternalId": "survey1a7615c6_role_external_id",
+    "policyName": "survey1a7615c6-sns-policy",
+    "mfaLambdaLogPolicy": "survey1a7615c6_totp_lambda_log_policy",
+    "mfaPassRolePolicy": "survey1a7615c6_totp_pass_role_policy",
+    "mfaLambdaIAMPolicy": "survey1a7615c6_totp_lambda_iam_policy",
+    "userpoolClientLogPolicy": "survey1a7615c6_userpoolclient_lambda_log_policy",
+    "userpoolClientLambdaPolicy": "survey1a7615c6_userpoolclient_lambda_iam_policy",
+    "resourceName": "surveypwa1a7615c6",
+    "authSelections": "identityPoolAndUserPool",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "authRoleArn": {
+        "Fn::GetAtt": [
+            "AuthRole",
+            "Arn"
+        ]
+    },
+    "unauthRoleArn": {
+        "Fn::GetAtt": [
+            "UnauthRole",
+            "Arn"
+        ]
+    },
+    "useDefault": "manual",
+    "thirdPartyAuth": false,
+    "triggers": "{\"PostConfirmation\":[\"add-to-group\"]}",
+    "hostedUI": false,
+    "PostConfirmation": "surveypwa1a7615c6PostConfirmation",
+    "parentStack": {
+        "Ref": "AWS::StackId"
+    },
+    "permissions": [
+        "{\"policyName\":\"AddToGroupCognito\",\"trigger\":\"PostConfirmation\",\"effect\":\"Allow\",\"actions\":[\"cognito-idp:AdminAddUserToGroup\",\"cognito-idp:GetGroup\",\"cognito-idp:CreateGroup\"],\"resource\":{\"paramType\":\"!GetAtt\",\"keys\":[\"UserPool\",\"Arn\"]}}"
+    ],
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "surveypwa1a7615c6PostConfirmation",
+            "triggerProvider": "Cognito",
+            "attributes": [
+                "Arn",
+                "Name"
+            ]
+        }
+    ]
+}
