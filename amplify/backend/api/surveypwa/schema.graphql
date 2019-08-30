@@ -1,5 +1,5 @@
 type Survey
-  @model
+  @model (subscriptions: { level: OFF })
   @auth (rules: [
     {allow: groups, groups: ["SurveyAdmins"]},
     {allow: groups, groupsField: "groups", operations: [read]}
@@ -17,14 +17,14 @@ type Survey
 }
 
 type Questionnaire
-  @model
+  @model (subscriptions: { level: OFF })
+  @auth (rules: [{allow: groups, groups: ["Users"]}])
 {
   id: ID!
   name: String!
   description: String!
   type: QuestionnaireType
   question: [Question] @connection(name: "QuestionnaireQuestions")
-  # question: [Question] @connection(name: "QuestionnaireQuestions", sortField: "order")
 }
 
 enum QuestionnaireType {
@@ -34,7 +34,8 @@ enum QuestionnaireType {
 }
 
 type Question
-  @model
+  @model (subscriptions: { level: OFF })
+  @auth (rules: [{allow: groups, groups: ["Users"]}])
 {
     id: ID!
     qu: String!
@@ -52,7 +53,7 @@ enum QuestionType {
 }
 
 type Responses
-  @model
+  @model (subscriptions: { level: OFF })
   @auth(rules: [{allow: owner}])
 {
     id: ID!
@@ -62,7 +63,7 @@ type Responses
 }
 
 type SurveyEntries
-  @model
+  @model (subscriptions: { level: OFF })
   @auth(rules: [{allow: owner}])
 {
     id: ID!
